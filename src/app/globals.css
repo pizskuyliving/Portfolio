@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+/* Palet: biru muda #64B1CB, navy #0D3044, kuning #FBB716, oranye #F58409 */
+@theme {
+  --color-sky: #64b1cb;
+  --color-navy: #0d3044;
+  --color-ink: #0d3044;
+  --color-sun: #fbb716;
+  --color-ember: #f58409;
+  --color-paper: #f2f8fa;
+  --color-mist: #e1eef3;
+  --color-line: #c9dde5;
+  --color-muted: #4a6572;
+  --color-clay: #a23b2a;
+}
+
+@theme inline {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-navy);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  a {
+    text-underline-offset: 0.2em;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-ember);
+    outline-offset: 3px;
+  }
+}
+
+/* ---------- Animasi ---------- */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.9) rotate(-2deg); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes id-drop {
+  0%   { transform: translateY(-125%); opacity: 0; }
+  8%   { opacity: 1; }
+  58%  { transform: translateY(3.5%); }
+  74%  { transform: translateY(-2%); }
+  88%  { transform: translateY(0.8%); }
+  100% { transform: none; }
+}
+@keyframes id-drop-sm {
+  0%   { transform: translateY(-40%) scale(0.96); opacity: 0; }
+  35%  { opacity: 1; }
+  60%  { transform: translateY(2%) scale(1); }
+  80%  { transform: translateY(-1%); }
+  100% { transform: none; }
+}
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* Urutan masuk di hero */
+.rise { animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0ms); }
+.pop  { animation: pop 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: var(--d, 0ms); }
+
+/* Muncul saat di-scroll (hanya bila JavaScript aktif) */
+.reveal { transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1); }
+@media (scripting: enabled) {
+  .reveal:not(.in) { opacity: 0; transform: translateY(24px); }
+}
+
+/* Kartu ID: balik depan-belakang */
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flipper { transition: transform 0.8s cubic-bezier(0.3, 0.7, 0.2, 1); }
+
+/* Pita skill berjalan */
+.id-drop { --htop: 80px; animation: id-drop 1.2s cubic-bezier(0.32, 0, 0.35, 1) both; }
+
+@media (max-width: 1023px) {
+  .id-drop { animation-name: id-drop-sm; }
+}
+@media (min-width: 1024px) {
+  .id-drop { --htop: 300px; }
+}
+
+.marquee-track { animation: marquee 34s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rise, .pop, .id-drop, .marquee-track { animation: none !important; }
+  .flipper { transition: none !important; }
+  .reveal { transition: none !important; opacity: 1 !important; transform: none !important; }
+  .marquee-track { flex-wrap: wrap; width: auto !important; }
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded border border-ink/25 bg-white px-3 py-2 text-base;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium;
+  }
+  .btn {
+    @apply inline-block cursor-pointer rounded-full bg-navy px-5 py-2 text-base font-semibold text-white hover:opacity-90;
+  }
+  .btn-ghost {
+    @apply inline-block cursor-pointer rounded-full border border-ink/30 px-4 py-1.5 text-sm hover:bg-mist;
+  }
+  .btn-danger {
+    @apply inline-block cursor-pointer rounded-full border border-clay/50 px-4 py-1.5 text-sm text-clay hover:bg-clay hover:text-white;
+  }
+}

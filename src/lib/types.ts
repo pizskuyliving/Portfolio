@@ -10,6 +10,14 @@ export type Profile = {
   github: string | null;
   linkedin: string | null;
   hobbies: string[];
+  card_title: string | null;
+  card_subtitle: string | null;
+  card_role: string | null;
+  card_education: string | null;
+  card_location: string | null;
+  card_photo_url: string | null;
+  card_back_title: string | null;
+  card_back_text: string | null;
 };
 
 export type Skill = { id: string; name: string; category: string; level: number; sort: number };

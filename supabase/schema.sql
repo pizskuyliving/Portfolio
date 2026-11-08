@@ -130,3 +130,15 @@ create policy "certifications admin" on public.certifications for all using (pub
 
 -- === v5: nama panggilan ===
 alter table public.profile add column if not exists nickname text;
+
+-- === v6: isi kartu ID ===
+
+alter table public.profile
+  add column if not exists card_title text,
+  add column if not exists card_subtitle text,
+  add column if not exists card_role text,
+  add column if not exists card_education text,
+  add column if not exists card_location text,
+  add column if not exists card_photo_url text,
+  add column if not exists card_back_title text,
+  add column if not exists card_back_text text;

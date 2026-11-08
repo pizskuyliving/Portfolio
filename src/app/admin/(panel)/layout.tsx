@@ -9,6 +9,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
       <nav className="flex flex-wrap items-center gap-5 border-b border-ink/15 pb-4 text-sm">
         <Link href="/admin" className="font-semibold">Admin</Link>
         <Link href="/admin/profile" className="hover:underline">Profil</Link>
+        <Link href="/admin/card" className="hover:underline">Kartu ID</Link>
         <Link href="/admin/experiences" className="hover:underline">Pengalaman</Link>
         <Link href="/admin/certifications" className="hover:underline">Sertifikasi</Link>
         <Link href="/admin/projects" className="hover:underline">Project</Link>

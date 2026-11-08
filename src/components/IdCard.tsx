@@ -1,8 +1,8 @@
 "use client";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { CardBack, CardFront } from "@/components/IdCardFaces";
+import type { CardData } from "@/lib/card";
 
-const BARS = [2, 1, 3, 1, 2, 1, 1, 3, 2, 1, 2, 3, 1, 1, 2, 1, 3, 2, 1, 2, 1, 3, 1, 2, 2, 1, 3, 1];
 const trimUrl = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
@@ -20,11 +20,7 @@ const geo = () => {
 };
 
 type Props = {
-  name: string;
-  photoUrl?: string | null;
-  role?: string | null;
-  education?: string | null;
-  location?: string | null;
+  data: CardData;
   email?: string | null;
   github?: string | null;
   linkedin?: string | null;
@@ -34,7 +30,8 @@ type Props = {
  * Kartu ID berlanyard dengan fisika bandul: bisa ditarik, dilempar, dan berayun alami.
  * Klik/ketuk kartu atau tombol "Balik kartu" untuk melihat sisi belakang (kontak).
  */
-export default function IdCard({ name, photoUrl, role, education, location, email, github, linkedin }: Props) {
+export default function IdCard({ data, email, github, linkedin }: Props) {
+  const name = data.name;
   const [flipped, setFlipped] = useState(false);
   const [grabbing, setGrabbing] = useState(false);
 
@@ -305,135 +302,15 @@ export default function IdCard({ name, photoUrl, role, education, location, emai
                 onClick={() => setFlipped((f) => !f)}
               >
                 {/* DEPAN */}
-                <div
-                  inert={flipped}
-                  className="backface-hidden relative overflow-hidden rounded-3xl bg-white shadow-[0_30px_46px_-22px_rgba(13,48,68,0.65)] ring-1 ring-navy/10"
-                >
-                  <div className="relative flex items-center gap-3 overflow-hidden bg-navy px-5 pb-2.5 pt-6">
-                    <div className="absolute -right-8 -top-10 h-28 w-28 rounded-full border-[14px] border-sky/25" aria-hidden="true" />
-                    <div className="absolute left-1/2 top-2 h-2 w-12 -translate-x-1/2 rounded-full bg-paper ring-1 ring-black/20" aria-hidden="true" />
-                    <span className="relative grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sun text-sm font-extrabold text-navy" aria-hidden="true">
-                      {name.slice(0, 1)}
-                    </span>
-                    <div className="relative leading-tight text-white">
-                      <p className="text-sm font-bold">Kartu Pengenal</p>
-                      <p className="text-xs text-white/70">Portofolio</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex items-start gap-3.5 px-5">
-                    <div className="relative h-36 w-28 shrink-0">
-                      <div className="relative h-full w-full overflow-hidden rounded-2xl border-4 border-sun bg-sky">
-                        {photoUrl ? (
-                          <Image src={photoUrl} alt={`Foto ${name}`} fill priority draggable={false} sizes="112px" className="object-cover" />
-                        ) : (
-                          <div className="flex h-full items-center justify-center text-5xl font-extrabold text-white/90">
-                            {name.slice(0, 1)}
-                          </div>
-                        )}
-                      </div>
-                      {/* stiker hologram */}
-                      <span
-                        className="absolute -bottom-2 -right-2 h-9 w-9 rounded-full border-2 border-white shadow"
-                        style={{ background: "conic-gradient(from 90deg, #64b1cb, #fbb716, #f58409, #64b1cb)" }}
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <div className="min-w-0 pt-1">
-                      <p className="text-lg font-extrabold leading-tight tracking-tight">{name}</p>
-                      {role && <p className="mt-1.5 text-xs font-medium leading-snug text-muted">{role}</p>}
-                    </div>
-                  </div>
-
-                  {(education || location) && (
-                    <dl className="mx-5 mt-4 space-y-2 rounded-xl bg-mist p-3 text-left">
-                      {education && (
-                        <div>
-                          <dt className="text-xs text-muted">Pendidikan</dt>
-                          <dd className="text-[0.8rem] font-semibold leading-snug">{education}</dd>
-                        </div>
-                      )}
-                      {location && (
-                        <div>
-                          <dt className="text-xs text-muted">Lokasi</dt>
-                          <dd className="text-[0.8rem] font-semibold">{location}</dd>
-                        </div>
-                      )}
-                    </dl>
-                  )}
-
-                  <div className="flex items-center justify-between px-5 py-3" aria-hidden="true">
-                    <div className="relative h-8 w-11 overflow-hidden rounded-md border border-navy/30 bg-[linear-gradient(135deg,#ffd45a,#fbb716_55%,#e89a0b)]">
-                      <span className="absolute inset-x-0 top-1/2 h-px bg-navy/30" />
-                      <span className="absolute inset-y-0 left-1/3 w-px bg-navy/30" />
-                      <span className="absolute inset-y-0 left-2/3 w-px bg-navy/30" />
-                    </div>
-                    <div className="flex h-8 items-stretch gap-0.5">
-                      {BARS.map((w, i) => (
-                        <span key={i} className="bg-navy" style={{ width: `${w * 1.5}px` }} />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex h-2.5" aria-hidden="true">
-                    <span className="flex-1 bg-sky" />
-                    <span className="flex-1 bg-sun" />
-                    <span className="flex-1 bg-ember" />
-                  </div>
-
-                  {/* kilau yang ikut bergerak saat kartu berayun */}
-                  <div
-                    ref={glareRef}
-                    className="pointer-events-none absolute inset-0 z-20 bg-no-repeat opacity-60"
-                    style={{
-                      backgroundImage:
-                        "linear-gradient(115deg, transparent 38%, rgba(255,255,255,0.7) 50%, transparent 62%)",
-                      backgroundSize: "260% 100%",
-                      backgroundPosition: "50% 0",
-                    }}
-                    aria-hidden="true"
-                  />
-                </div>
+                <CardFront data={data} inert={flipped} glareRef={glareRef} className="backface-hidden" />
 
                 {/* BELAKANG */}
-                <div
+                <CardBack
+                  data={data}
+                  contacts={contacts}
                   inert={!flipped}
-                  className="backface-hidden absolute inset-0 flex flex-col overflow-hidden rounded-3xl bg-navy text-white shadow-[0_30px_46px_-22px_rgba(13,48,68,0.65)] [transform:rotateY(180deg)]"
-                >
-                  <div className="mt-8 h-9 bg-[#06141c]" aria-hidden="true" />
-                  <div className="flex-1 px-5 pt-4">
-                    <h3 className="text-lg">Ayo terhubung</h3>
-                    <p className="mt-1.5 text-xs text-white/75">Kirim pesan lewat salah satu kanal ini.</p>
-                    {contacts.length > 0 ? (
-                      <ul className="mt-3 space-y-2.5">
-                        {contacts.map((c) => (
-                          <li key={c.label}>
-                            <p className="text-[0.7rem] leading-none text-white/60">{c.label}</p>
-                            <a
-                              href={c.href}
-                              target={c.href.startsWith("http") ? "_blank" : undefined}
-                              rel="noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="break-all text-sm font-semibold leading-tight text-sun underline"
-                            >
-                              {c.text}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="mt-3 text-sm text-white/75">Kontak belum ditambahkan.</p>
-                    )}
-                  </div>
-                  <p className="px-5 pb-3 text-xs text-white/60">
-                    {name}
-                    {location ? `, ${location}` : ""}
-                  </p>
-                  <div className="flex h-2.5" aria-hidden="true">
-                    <span className="flex-1 bg-sky" />
-                    <span className="flex-1 bg-sun" />
-                    <span className="flex-1 bg-ember" />
-                  </div>
-                </div>
+                  className="backface-hidden absolute inset-0 [transform:rotateY(180deg)]"
+                />
               </div>
             </div>
           </div>

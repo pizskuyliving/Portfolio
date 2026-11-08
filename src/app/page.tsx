@@ -3,6 +3,7 @@ import Link from "next/link";
 import BrowserFrame from "@/components/BrowserFrame";
 import CountUp from "@/components/CountUp";
 import IdCard from "@/components/IdCard";
+import { resolveCard } from "@/lib/card";
 import Reveal from "@/components/Reveal";
 import { getCertifications, getExperiences, getProfile, getProjects, getSkills } from "@/lib/data";
 import type { Certification, Skill } from "@/lib/types";
@@ -129,11 +130,7 @@ export default async function Home() {
         </div>
 
         <IdCard
-          name={name}
-          photoUrl={profile?.photo_url}
-          role={profile?.headline?.split(",")[0]}
-          education={education[0] ? `${education[0].role}, ${education[0].org}` : null}
-          location={profile?.location}
+          data={resolveCard(profile, education[0])}
           email={profile?.email}
           github={profile?.github}
           linkedin={profile?.linkedin}

@@ -177,3 +177,43 @@ export async function deleteCertification(fd: FormData) {
   revalidatePath("/");
   redirect("/admin/certifications");
 }
+
+export async function saveCard(fd: FormData) {
+  const supabase = await requireAdmin();
+  const { error } = await supabase
+    .from("profile")
+    .update({
+      card_title: str(fd, "card_title"),
+      card_subtitle: str(fd, "card_subtitle"),
+      card_role: str(fd, "card_role"),
+      card_education: str(fd, "card_education"),
+      card_location: str(fd, "card_location"),
+      card_photo_url: str(fd, "card_photo_url") || null,
+      card_back_title: str(fd, "card_back_title"),
+      card_back_text: str(fd, "card_back_text"),
+    })
+    .eq("id", 1);
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  redirect("/admin/card?saved=1");
+}
+
+export async function resetCard() {
+  const supabase = await requireAdmin();
+  const { error } = await supabase
+    .from("profile")
+    .update({
+      card_title: null,
+      card_subtitle: null,
+      card_role: null,
+      card_education: null,
+      card_location: null,
+      card_photo_url: null,
+      card_back_title: null,
+      card_back_text: null,
+    })
+    .eq("id", 1);
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  redirect("/admin/card?saved=1");
+}

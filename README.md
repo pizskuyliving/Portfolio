@@ -38,3 +38,7 @@ Animasi otomatis mati bila pengguna memilih "kurangi gerakan" di perangkatnya.
 1. SQL Editor: jalankan `supabase/update-v3.sql` (kategori organisasi + tabel sertifikasi).
 2. Jalankan `supabase/content-linkedin.sql` sekali. File ini MENGGANTI isi pengalaman, skill, dan sertifikasi, serta bio/email/LinkedIn di profil.
 3. Kelola sertifikasi di /admin/certifications.
+
+## Update v6 (kartu ID bisa diedit)
+1. SQL Editor: jalankan `supabase/add-card.sql`.
+2. Buka /admin/card: klik teks atau foto langsung di kartu, lalu Simpan kartu.

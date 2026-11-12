@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
-import { CardBack, CardFront, type Contact } from "@/components/IdCardFaces";
-import type { CardData } from "@/lib/card";
+import ConfirmButton from "@/components/ConfirmButton";
+import { CardBack, CardFront } from "@/components/IdCardFaces";
+import type { CardData, Contact } from "@/lib/card";
 
 /** Editor kartu ID: teks dan foto diedit langsung di atas kartu. */
 export default function CardEditor({
@@ -72,7 +73,9 @@ export default function CardEditor({
           Ingin kartu kembali mengikuti profil dan pendidikan secara otomatis? Semua isi kartu yang kamu ubah akan
           dihapus.
         </p>
-        <button className="btn-ghost mt-3">Kembalikan ke isi otomatis</button>
+        <ConfirmButton className="btn-ghost mt-3" message="Hapus semua isi kartu yang sudah kamu ubah?">
+          Kembalikan ke isi otomatis
+        </ConfirmButton>
       </form>
     </div>
   );

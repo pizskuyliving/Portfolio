@@ -3,12 +3,30 @@ import Link from "next/link";
 import BrowserFrame from "@/components/BrowserFrame";
 import CountUp from "@/components/CountUp";
 import IdCard from "@/components/IdCard";
-import { resolveCard } from "@/lib/card";
+import { contactsOf, resolveCard } from "@/lib/card";
 import Reveal from "@/components/Reveal";
 import { getCertifications, getExperiences, getProfile, getProjects, getSkills } from "@/lib/data";
-import type { Certification, Skill } from "@/lib/types";
+import type { Experience } from "@/lib/types";
 
 const delay = (ms: number) => ({ "--d": `${ms}ms` }) as React.CSSProperties;
+
+/** Garis waktu pengalaman. `main` = daftar utama (pekerjaan): jarak dan judul lebih besar. */
+function Timeline({ items, dot, main = false }: { items: Experience[]; dot: string; main?: boolean }) {
+  const Title = main ? "h3" : "h4";
+  return (
+    <ol className={`relative max-w-3xl border-l-2 border-sky pl-8 ${main ? "mt-12 space-y-12" : "mt-10 space-y-10"}`}>
+      {items.map((e) => (
+        <li key={e.id} className="relative">
+          <span className={`absolute -left-[41px] top-1.5 h-4 w-4 rounded-full ${dot} ring-4 ring-paper`} aria-hidden="true" />
+          <p className="inline-block rounded-full bg-mist px-3 py-0.5 text-sm font-semibold">{e.period}</p>
+          <Title className={main ? "mt-2 text-2xl" : "mt-2 text-xl font-bold"}>{e.role}</Title>
+          <p className="font-medium text-muted">{e.org}</p>
+          {e.description && <p className={`${main ? "mt-3" : "mt-2"} max-w-[60ch]`}>{e.description}</p>}
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 export default async function Home() {
   const [profile, skills, projects, experiences, certs] = await Promise.all([
@@ -21,22 +39,12 @@ export default async function Home() {
   const name = profile?.name || "Nama Kamu";
   const navName = profile?.nickname || name; // nama di navbar: panggilan bila diisi, selain itu nama lengkap
 
-  const groups: { name: string; items: Skill[] }[] = [];
-  for (const s of skills) {
-    const g = groups.find((x) => x.name === s.category);
-    if (g) g.items.push(s);
-    else groups.push({ name: s.category, items: [s] });
-  }
+  // urutan grup = urutan kemunculan pertama (data sudah terurut dari database)
+  const groups = Object.entries(Object.groupBy(skills, (s) => s.category));
   const work = experiences.filter((e) => e.kind === "work");
   const education = experiences.filter((e) => e.kind === "education");
   const orgs = experiences.filter((e) => e.kind === "organization");
-
-  const certGroups: { issuer: string; items: Certification[] }[] = [];
-  for (const c of certs) {
-    const g = certGroups.find((x) => x.issuer === c.issuer);
-    if (g) g.items.push(c);
-    else certGroups.push({ issuer: c.issuer, items: [c] });
-  }
+  const certGroups = Object.entries(Object.groupBy(certs, (c) => c.issuer));
   const skillNames = skills.map((s) => s.name);
 
   // ringkasan angka dari data yang ada (tidak ada angka karangan)
@@ -129,12 +137,7 @@ export default async function Home() {
           )}
         </div>
 
-        <IdCard
-          data={resolveCard(profile, education[0])}
-          email={profile?.email}
-          github={profile?.github}
-          linkedin={profile?.linkedin}
-        />
+        <IdCard data={resolveCard(profile, education[0])} contacts={contactsOf(profile)} />
       </section>
 
       {/* Pita skill berjalan */}
@@ -180,49 +183,19 @@ export default async function Home() {
       <section id="pengalaman" className="mx-auto max-w-6xl scroll-mt-24 px-6 pb-28">
         <Reveal>
           <h2 className="text-4xl sm:text-5xl">Perjalanan saya</h2>
-          <ol className="relative mt-12 max-w-3xl space-y-12 border-l-2 border-sky pl-8">
-            {work.map((e) => (
-              <li key={e.id} className="relative">
-                <span className="absolute -left-[41px] top-1.5 h-4 w-4 rounded-full bg-ember ring-4 ring-paper" aria-hidden="true" />
-                <p className="inline-block rounded-full bg-mist px-3 py-0.5 text-sm font-semibold">{e.period}</p>
-                <h3 className="mt-2 text-2xl">{e.role}</h3>
-                <p className="font-medium text-muted">{e.org}</p>
-                {e.description && <p className="mt-3 max-w-[60ch]">{e.description}</p>}
-              </li>
-            ))}
-          </ol>
+          <Timeline items={work} dot="bg-ember" main />
 
           {education.length > 0 && (
             <>
               <h3 className="mt-20 text-3xl">Pendidikan</h3>
-              <ol className="relative mt-10 max-w-3xl space-y-10 border-l-2 border-sky pl-8">
-                {education.map((e) => (
-                  <li key={e.id} className="relative">
-                    <span className="absolute -left-[41px] top-1.5 h-4 w-4 rounded-full bg-sky ring-4 ring-paper" aria-hidden="true" />
-                    <p className="inline-block rounded-full bg-mist px-3 py-0.5 text-sm font-semibold">{e.period}</p>
-                    <h4 className="mt-2 text-xl font-bold">{e.role}</h4>
-                    <p className="font-medium text-muted">{e.org}</p>
-                    {e.description && <p className="mt-2 max-w-[60ch]">{e.description}</p>}
-                  </li>
-                ))}
-              </ol>
+              <Timeline items={education} dot="bg-sky" />
             </>
           )}
 
           {orgs.length > 0 && (
             <>
               <h3 className="mt-20 text-3xl">Organisasi</h3>
-              <ol className="relative mt-10 max-w-3xl space-y-10 border-l-2 border-sky pl-8">
-                {orgs.map((e) => (
-                  <li key={e.id} className="relative">
-                    <span className="absolute -left-[41px] top-1.5 h-4 w-4 rounded-full bg-sun ring-4 ring-paper" aria-hidden="true" />
-                    <p className="inline-block rounded-full bg-mist px-3 py-0.5 text-sm font-semibold">{e.period}</p>
-                    <h4 className="mt-2 text-xl font-bold">{e.role}</h4>
-                    <p className="font-medium text-muted">{e.org}</p>
-                    {e.description && <p className="mt-2 max-w-[60ch]">{e.description}</p>}
-                  </li>
-                ))}
-              </ol>
+              <Timeline items={orgs} dot="bg-sun" />
             </>
           )}
         </Reveal>
@@ -282,11 +255,11 @@ export default async function Home() {
         <Reveal>
           <h2 className="text-4xl sm:text-5xl">Yang sering saya pakai</h2>
           <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2">
-            {groups.map((g) => (
-              <div key={g.name}>
-                <h3 className="text-xl">{g.name}</h3>
+            {groups.map(([category, items = []]) => (
+              <div key={category}>
+                <h3 className="text-xl">{category}</h3>
                 <ul className="mt-4 flex flex-wrap gap-2.5">
-                  {g.items.map((s) => (
+                  {items.map((s) => (
                     <li
                       key={s.id}
                       className="rounded-full border border-line bg-white px-4 py-1.5 font-medium transition duration-200 hover:-translate-y-0.5 hover:border-sun hover:bg-sun"
@@ -307,14 +280,14 @@ export default async function Home() {
           <Reveal>
             <h2 className="text-4xl sm:text-5xl">Sertifikasi</h2>
             <div className="mt-10 space-y-6">
-              {certGroups.map((g) => (
-                <div key={g.issuer} className="rounded-3xl bg-white p-6 sm:p-8">
+              {certGroups.map(([issuer, items = []]) => (
+                <div key={issuer} className="rounded-3xl bg-white p-6 sm:p-8">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="text-2xl">{g.issuer}</h3>
-                    <p className="text-sm text-muted">{g.items.length} sertifikat</p>
+                    <h3 className="text-2xl">{issuer}</h3>
+                    <p className="text-sm text-muted">{items.length} sertifikat</p>
                   </div>
                   <ul className="mt-5 grid grid-cols-1 gap-x-10 gap-y-3 md:grid-cols-2">
-                    {g.items.map((c) => (
+                    {items.map((c) => (
                       <li key={c.id} className="flex items-baseline justify-between gap-4 border-b border-line pb-2">
                         <span className="min-w-0 font-medium">{c.title}</span>
                         <span className="shrink-0 text-sm text-muted">{c.issued}</span>

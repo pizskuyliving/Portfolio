@@ -1,3 +1,4 @@
+import ConfirmButton from "@/components/ConfirmButton";
 import { getSkills } from "@/lib/data";
 import { addSkill, deleteSkill } from "../../actions";
 
@@ -34,7 +35,7 @@ export default async function SkillsAdmin() {
             <span className="text-sm text-ink/60">{s.category}</span>
             <form action={deleteSkill}>
               <input type="hidden" name="id" value={s.id} />
-              <button className="btn-danger">Hapus</button>
+              <ConfirmButton>Hapus</ConfirmButton>
             </form>
           </li>
         ))}

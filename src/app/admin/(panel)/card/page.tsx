@@ -1,20 +1,11 @@
 import CardEditor from "@/components/CardEditor";
-import type { Contact } from "@/components/IdCardFaces";
-import { resolveCard } from "@/lib/card";
+import { contactsOf, resolveCard } from "@/lib/card";
 import { getExperiences, getProfile } from "@/lib/data";
 import { resetCard, saveCard } from "../../actions";
-
-const trimUrl = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 
 export default async function CardAdmin({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
   const [profile, experiences, { saved }] = await Promise.all([getProfile(), getExperiences(), searchParams]);
   const education = experiences.find((e) => e.kind === "education");
-
-  const contacts = [
-    profile?.email && { label: "Email", text: profile.email, href: `mailto:${profile.email}` },
-    profile?.github && { label: "GitHub", text: trimUrl(profile.github), href: profile.github },
-    profile?.linkedin && { label: "LinkedIn", text: trimUrl(profile.linkedin), href: profile.linkedin },
-  ].filter(Boolean) as Contact[];
 
   return (
     <div className="max-w-3xl">
@@ -23,7 +14,7 @@ export default async function CardAdmin({ searchParams }: { searchParams: Promis
       <div className="mt-8">
         <CardEditor
           initial={resolveCard(profile, education)}
-          contacts={contacts}
+          contacts={contactsOf(profile)}
           saveAction={saveCard}
           resetAction={resetCard}
         />

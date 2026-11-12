@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { CardBack, CardFront } from "@/components/IdCardFaces";
-import type { CardData } from "@/lib/card";
+import type { CardData, Contact } from "@/lib/card";
 
-const trimUrl = (u: string) => u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
 // Parameter fisika bandul
@@ -19,18 +18,13 @@ const geo = () => {
   return { lg, htop, sp: lg ? 64 : 30, L: htop + CLASP_Y };
 };
 
-type Props = {
-  data: CardData;
-  email?: string | null;
-  github?: string | null;
-  linkedin?: string | null;
-};
+type Props = { data: CardData; contacts: Contact[] };
 
 /**
  * Kartu ID berlanyard dengan fisika bandul: bisa ditarik, dilempar, dan berayun alami.
  * Klik/ketuk kartu atau tombol "Balik kartu" untuk melihat sisi belakang (kontak).
  */
-export default function IdCard({ data, email, github, linkedin }: Props) {
+export default function IdCard({ data, contacts }: Props) {
   const name = data.name;
   const [flipped, setFlipped] = useState(false);
   const [grabbing, setGrabbing] = useState(false);
@@ -205,12 +199,6 @@ export default function IdCard({ data, email, github, linkedin }: Props) {
     window.addEventListener("pointerup", up);
     window.addEventListener("pointercancel", up);
   }
-
-  const contacts = [
-    email && { label: "Email", text: email, href: `mailto:${email}` },
-    github && { label: "GitHub", text: trimUrl(github), href: github },
-    linkedin && { label: "LinkedIn", text: trimUrl(linkedin), href: linkedin },
-  ].filter(Boolean) as { label: string; text: string; href: string }[];
 
   return (
     <div className="relative mx-auto mt-12 w-full max-w-[17.5rem] pb-2 lg:mt-0">

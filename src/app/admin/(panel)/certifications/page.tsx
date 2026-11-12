@@ -1,3 +1,4 @@
+import ConfirmButton from "@/components/ConfirmButton";
 import { getCertifications } from "@/lib/data";
 import type { Certification } from "@/lib/types";
 import { deleteCertification, saveCertification } from "../../actions";
@@ -54,7 +55,7 @@ export default async function CertificationsAdmin() {
               </form>
               <form action={deleteCertification} className="mt-3">
                 <input type="hidden" name="id" value={c.id} />
-                <button className="btn-danger">Hapus</button>
+                <ConfirmButton>Hapus</ConfirmButton>
               </form>
             </details>
           </li>

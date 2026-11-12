@@ -20,7 +20,7 @@ export type Profile = {
   card_back_text: string | null;
 };
 
-export type Skill = { id: string; name: string; category: string; level: number; sort: number };
+export type Skill = { id: string; name: string; category: string; sort: number };
 
 export type ProjectImage = {
   id: string;

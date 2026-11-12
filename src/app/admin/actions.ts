@@ -3,12 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
+import { slugify } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
 
 const str = (fd: FormData, k: string) => String(fd.get(k) ?? "").trim();
 const csv = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean);
-const slugify = (s: string) =>
-  s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+const STORAGE_PREFIX = "/storage/v1/object/public/portfolio/";
 
 export async function login(fd: FormData) {
   const supabase = await createClient();
@@ -52,6 +52,8 @@ export async function saveProject(fd: FormData) {
   const id = str(fd, "id");
   const title = str(fd, "title");
   const slug = slugify(str(fd, "slug") || title);
+  const back = `/admin/projects/${id || "new"}`;
+  if (!slug) redirect(`${back}?error=slug-kosong`);
 
   let images: { url: string; caption: string }[] = [];
   try {
@@ -73,23 +75,18 @@ export async function saveProject(fd: FormData) {
     sort: Number(str(fd, "sort")) || 0,
   };
 
-  let projectId = id;
-  if (id) {
-    const { error } = await supabase.from("projects").update(payload).eq("id", id);
-    if (error) throw new Error(error.message);
-  } else {
-    const { data, error } = await supabase.from("projects").insert(payload).select("id").single();
-    if (error) throw new Error(error.message);
-    projectId = data.id;
-  }
+  const { data, error } = id
+    ? await supabase.from("projects").update(payload).eq("id", id).select("id").single()
+    : await supabase.from("projects").insert(payload).select("id").single();
+  if (error?.code === "23505") redirect(`${back}?error=slug-dipakai`); // slug sudah dipakai project lain
+  if (error) throw new Error(error.message);
 
-  await supabase.from("project_images").delete().eq("project_id", projectId);
-  if (images.length > 0) {
-    const { error } = await supabase.from("project_images").insert(
-      images.map((img, i) => ({ project_id: projectId, url: img.url, caption: img.caption ?? "", sort: i }))
-    );
-    if (error) throw new Error(error.message);
-  }
+  // hapus + isi ulang gambar dalam satu transaksi (fungsi SQL di supabase/schema.sql)
+  const { error: imgError } = await supabase.rpc("replace_project_images", {
+    p_project_id: data.id,
+    p_images: images,
+  });
+  if (imgError) throw new Error(imgError.message);
 
   revalidatePath("/");
   revalidatePath(`/projects/${slug}`);
@@ -98,8 +95,16 @@ export async function saveProject(fd: FormData) {
 
 export async function deleteProject(fd: FormData) {
   const supabase = await requireAdmin();
-  const { error } = await supabase.from("projects").delete().eq("id", str(fd, "id"));
+  const id = str(fd, "id");
+  const { data: imgs } = await supabase.from("project_images").select("url").eq("project_id", id);
+  const { error } = await supabase.from("projects").delete().eq("id", id);
   if (error) throw new Error(error.message);
+  // file baru dihapus setelah baris database terhapus; kalau gagal, hanya tersisa file yatim
+  const paths = (imgs ?? []).flatMap(({ url }) => {
+    const i = url.indexOf(STORAGE_PREFIX);
+    return i >= 0 ? [decodeURIComponent(url.slice(i + STORAGE_PREFIX.length))] : [];
+  });
+  if (paths.length > 0) await supabase.storage.from("portfolio").remove(paths);
   revalidatePath("/");
   redirect("/admin/projects");
 }

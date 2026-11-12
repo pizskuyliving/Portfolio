@@ -1,3 +1,4 @@
+import ConfirmButton from "@/components/ConfirmButton";
 import { getExperiences } from "@/lib/data";
 import type { Experience } from "@/lib/types";
 import { deleteExperience, saveExperience } from "../../actions";
@@ -66,7 +67,7 @@ export default async function ExperiencesAdmin() {
               </form>
               <form action={deleteExperience} className="mt-3">
                 <input type="hidden" name="id" value={e.id} />
-                <button className="btn-danger">Hapus</button>
+                <ConfirmButton>Hapus</ConfirmButton>
               </form>
             </details>
           </li>

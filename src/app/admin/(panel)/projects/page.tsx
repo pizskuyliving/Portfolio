@@ -1,3 +1,4 @@
+import ConfirmButton from "@/components/ConfirmButton";
 import Link from "next/link";
 import { getProjects } from "@/lib/data";
 import { deleteProject } from "../../actions";
@@ -22,7 +23,7 @@ export default async function ProjectsAdmin() {
               <Link href={`/admin/projects/${p.id}`} className="btn-ghost">Edit</Link>
               <form action={deleteProject}>
                 <input type="hidden" name="id" value={p.id} />
-                <button className="btn-danger">Hapus</button>
+                <ConfirmButton>Hapus</ConfirmButton>
               </form>
             </div>
           </li>

@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BrowserFrame from "@/components/BrowserFrame";
-import { getProjectBySlug } from "@/lib/data";
+import { getProject } from "@/lib/data";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const p = await getProjectBySlug(slug);
+  const p = await getProject("slug", slug);
   return { title: p?.title ?? "Project", description: p?.summary ?? undefined };
 }
 
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const project = await getProjectBySlug(slug);
+  const project = await getProject("slug", slug);
   if (!project || !project.published) notFound();
   const images = project.project_images ?? [];
 

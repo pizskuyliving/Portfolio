@@ -1,17 +1,29 @@
 import { notFound } from "next/navigation";
 import GalleryEditor from "@/components/GalleryEditor";
-import { getProjectById } from "@/lib/data";
+import { getProject } from "@/lib/data";
 import { saveProject } from "../../../actions";
 
-export default async function ProjectForm({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+const ERRORS: Record<string, string> = {
+  "slug-kosong": "Slug kosong. Isi slug sendiri dengan huruf atau angka Latin.",
+  "slug-dipakai": "Slug ini sudah dipakai project lain. Pakai slug yang berbeda.",
+};
+
+export default async function ProjectForm({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const [{ id }, { error }] = await Promise.all([params, searchParams]);
   const isNew = id === "new";
-  const p = isNew ? null : await getProjectById(id);
+  const p = isNew ? null : await getProject("id", id);
   if (!isNew && !p) notFound();
 
   return (
     <div>
       <h1 className="text-3xl font-semibold">{isNew ? "Tambah project" : "Edit project"}</h1>
+      {error && ERRORS[error] && <p className="mt-4 rounded bg-mist px-3 py-2 text-sm text-clay">{ERRORS[error]}</p>}
       <form action={saveProject} className="mt-8 max-w-2xl space-y-5">
         <input type="hidden" name="id" value={p?.id ?? ""} />
         <div>

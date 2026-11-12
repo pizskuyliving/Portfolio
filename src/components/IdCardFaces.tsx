@@ -1,13 +1,12 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import type { CardData } from "@/lib/card";
+import type { CardData, Contact } from "@/lib/card";
 import { uploadImage } from "@/lib/upload";
 
 const BARS = [2, 1, 3, 1, 2, 1, 1, 3, 2, 1, 2, 3, 1, 1, 2, 1, 3, 2, 1, 2, 1, 3, 1, 2, 2, 1, 3, 1];
 const SHADOW = "shadow-[0_30px_46px_-22px_rgba(13,48,68,0.65)]";
 
-export type Contact = { label: string; text: string; href: string };
 /** Bila diberikan, teks di kartu menjadi kolom isian dan foto bisa diganti langsung di kartu. */
 export type EditApi = { set: (key: keyof CardData, value: string | null) => void };
 

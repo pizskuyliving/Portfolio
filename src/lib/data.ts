@@ -1,11 +1,12 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Certification, Experience, Profile, Project, Skill } from "@/lib/types";
 
-export async function getProfile() {
+export const getProfile = cache(async () => {
   const supabase = await createClient();
   const { data } = await supabase.from("profile").select("*").eq("id", 1).maybeSingle();
   return data as Profile | null;
-}
+});
 
 export async function getSkills() {
   const supabase = await createClient();
@@ -27,31 +28,19 @@ export async function getProjects(opts: { includeDrafts?: boolean } = {}) {
   return (data ?? []) as Project[];
 }
 
-export async function getProjectBySlug(slug: string) {
+// cache(): generateMetadata dan halaman memanggil ini dengan argumen sama, cukup satu query per request
+export const getProject = cache(async (col: "slug" | "id", value: string) => {
   const supabase = await createClient();
   const { data } = await supabase
     .from("projects")
     .select("*, project_images(*)")
-    .eq("slug", slug)
+    .eq(col, value)
     .maybeSingle();
   if (!data) return null;
   const project = data as Project;
   project.project_images = [...(project.project_images ?? [])].sort((a, b) => a.sort - b.sort);
   return project;
-}
-
-export async function getProjectById(id: string) {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("projects")
-    .select("*, project_images(*)")
-    .eq("id", id)
-    .maybeSingle();
-  if (!data) return null;
-  const project = data as Project;
-  project.project_images = [...(project.project_images ?? [])].sort((a, b) => a.sort - b.sort);
-  return project;
-}
+});
 
 export async function getExperiences() {
   const supabase = await createClient();

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import BrowserFrame from "@/components/BrowserFrame";
+import CertGroups from "@/components/CertGroups";
 import CountUp from "@/components/CountUp";
 import IdCard from "@/components/IdCard";
 import { contactsOf, resolveCard } from "@/lib/card";
@@ -44,7 +45,6 @@ export default async function Home() {
   const work = experiences.filter((e) => e.kind === "work");
   const education = experiences.filter((e) => e.kind === "education");
   const orgs = experiences.filter((e) => e.kind === "organization");
-  const certGroups = Object.entries(Object.groupBy(certs, (c) => c.issuer));
   const skillNames = skills.map((s) => s.name);
 
   // ringkasan angka dari data yang ada (tidak ada angka karangan)
@@ -278,24 +278,14 @@ export default async function Home() {
       {certs.length > 0 && (
         <section id="sertifikasi" className="mx-auto max-w-6xl scroll-mt-24 px-6 pb-28">
           <Reveal>
-            <h2 className="text-4xl sm:text-5xl">Sertifikasi</h2>
-            <div className="mt-10 space-y-6">
-              {certGroups.map(([issuer, items = []]) => (
-                <div key={issuer} className="rounded-3xl bg-white p-6 sm:p-8">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="text-2xl">{issuer}</h3>
-                    <p className="text-sm text-muted">{items.length} sertifikat</p>
-                  </div>
-                  <ul className="mt-5 grid grid-cols-1 gap-x-10 gap-y-3 md:grid-cols-2">
-                    {items.map((c) => (
-                      <li key={c.id} className="flex items-baseline justify-between gap-4 border-b border-line pb-2">
-                        <span className="min-w-0 font-medium">{c.title}</span>
-                        <span className="shrink-0 text-sm text-muted">{c.issued}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <h2 className="text-4xl sm:text-5xl">Sertifikasi</h2>
+              <Link href="/sertifikat" className="rounded-full bg-navy px-5 py-2 text-sm font-bold text-white transition hover:-translate-y-0.5">
+                Lihat detail dan kredensial
+              </Link>
+            </div>
+            <div className="mt-10">
+              <CertGroups certs={certs} />
             </div>
           </Reveal>
         </section>

@@ -20,6 +20,14 @@ function Fields({ c }: { c?: Certification }) {
         <input name="issued" defaultValue={c?.issued ?? ""} className="input" />
       </label>
       <label className="block">
+        <span className="label">ID kredensial (opsional)</span>
+        <input name="credential_id" defaultValue={c?.credential_id ?? ""} className="input" />
+      </label>
+      <label className="block">
+        <span className="label">Link kredensial (opsional, dari tombol &quot;Show credential&quot; di LinkedIn)</span>
+        <input name="url" type="url" defaultValue={c?.url ?? ""} className="input" />
+      </label>
+      <label className="block">
         <span className="label">Urutan</span>
         <input name="sort" type="number" defaultValue={c?.sort ?? 0} className="input w-24" />
       </label>

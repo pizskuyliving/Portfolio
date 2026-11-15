@@ -165,6 +165,8 @@ export async function saveCertification(fd: FormData) {
     title: str(fd, "title"),
     issuer: str(fd, "issuer"),
     issued: str(fd, "issued"),
+    credential_id: str(fd, "credential_id") || null,
+    url: str(fd, "url") || null,
     sort: Number(str(fd, "sort")) || 0,
   };
   const { error } = id

@@ -61,5 +61,7 @@ export type Certification = {
   title: string;
   issuer: string;
   issued: string;
+  credential_id: string | null;
+  url: string | null;
   sort: number;
 };

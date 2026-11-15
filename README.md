@@ -9,7 +9,7 @@
 6. `npm install` lalu `npm run dev`.
 7. Buka `http://localhost:3000/admin`, masuk, lalu isi profil, skill, dan project.
 
-Isi awal (opsional, jalankan sekali): `supabase/seed.sql`, `supabase/content-linkedin.sql` (MENGGANTI pengalaman, skill, sertifikasi, dan bio/email/LinkedIn), `supabase/add-projects.sql`, `supabase/update-skills.sql` (MENGGANTI semua skill).
+Isi awal (opsional, jalankan sekali): `supabase/seed.sql`, `supabase/content-linkedin.sql` (MENGGANTI pengalaman, skill, sertifikasi, dan bio/email/LinkedIn), `supabase/add-projects.sql`, `supabase/update-skills.sql` (MENGGANTI semua skill), `supabase/cert-credentials.sql` (ID kredensial sertifikat, setelah content-linkedin.sql).
 
 ## Tes
 `npm test` (memakai test runner bawaan Node, butuh Node 22.18+ atau 23.6+).

@@ -82,6 +82,9 @@ create table if not exists public.certifications (
   sort int not null default 0,
   created_at timestamptz not null default now()
 );
+alter table public.certifications
+  add column if not exists credential_id text,
+  add column if not exists url text;
 
 insert into public.profile (id, name, headline, location)
 values (1, 'Muhammad Al Hafiz', 'Lulusan Teknik Informatika yang membangun aplikasi web', 'Pekanbaru, Riau')
